@@ -1,0 +1,26 @@
+<div class="sidebar">
+    <div class="current-user">
+        <img src={{user['profile_url']}}  id="mystory" alt="profile picture">
+        <span class="user-username"> {{user['username']}} </span>
+    </div>
+    
+    <div class="suggestions">
+        <span class="interfacetextsug"> Suggestions for you </span>
+    </div>
+
+    {% for people in suggestions %}
+
+    <div class="story-suggestions">
+        <img src= {{people['profile_url']}}  id="stories" alt="profile picture">
+        <div class="user-suggested">
+            <span class="small-user"> {{people['username']}} </span>
+            <span class="small-interface-text"> suggested for you </span>
+        </div>
+        <div class="follow-button">
+            <a href="" class="link">  follow </a>
+        </div>
+    </div>
+
+    {% endfor %}
+
+</div>

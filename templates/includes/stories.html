@@ -1,0 +1,12 @@
+<div class="panel">
+
+    {% for u in stories %}
+
+    <div class="sp">
+        <img src={{u['user']['profile_url']}}  id="storiestop" alt="story picture">
+        <div class="su"> {{u['user']['username']}} </div>
+    </div>
+
+    {% endfor %}
+
+</div>

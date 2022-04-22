@@ -1,0 +1,67 @@
+{% for post in posts %}
+<div class="post">
+    <div class="top-post">
+        <span class="poster"> {{post['user']['username']}} </span>
+        <i class="fas fa-ellipsis-h"></i>
+    </div>
+
+    <img src={{post['image_url']}} id="post-image" alt="post picture">
+    
+    <div class="icons"> 
+        <div class="right-icons">
+            <i class="far fa-heart"></i>
+            <i class="far fa-comment"></i>
+            <i class="far fa-paper-plane"></i>
+        </div>
+        <div class="left-icon">
+            <i class="far fa-bookmark"></i>
+        </div>
+    </div>
+    
+    <div class="like">
+        <span class="likecount"> {{post['likes']}} likes </span>
+    </div>
+    
+    <div class="com">
+        <span class="username"> {{post['user']['username']}} </span>
+        <span class="comment"> {{post['title']}} ... </span>
+        <a href="" class="link"> more </a>
+    </div>
+    
+    {% if post['comments']|length >= 1 %}
+    
+    <div class="com">
+        <span class="username"> {{post['comments'][0]['user']['username']}} </span>
+        <span class="comment"> {{post['comments'][0]['text']}} </span>
+    </div>
+
+    {% if post['comments']|length >= 2 %}
+    
+    <a href="" class="link1"> View all {{post['comments'].length}} comments </a>
+
+    {% endif %}
+
+    {% endif %}
+    
+
+    <div class="time">
+        <span class="interfacetext"> {{post['display_time']}} </span>
+    </div>
+
+    <hr>
+
+    <div class="comment-box">
+        <div class="left-comment-box">
+            <div class="smiley">
+                <i class="far fa-smile"></i>
+            </div>
+            <label> Add a comment...
+            <input type = "text" alt="comment box">
+            </label>
+        </div>
+        <a href="" class="link"> Post </a>
+    </div> 
+
+</div>
+
+{% endfor %}

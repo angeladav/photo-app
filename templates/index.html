@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+<title>Photo App</title>
+</head>
+<body>
+
+    <!-- top bar of webpage -->
+    <div class="media-topbar">
+        {% include 'includes/navbar.html' %}
+    </div>
+    
+    <!-- dashboard -->
+
+<div class="media">
+    <div class="dashboard">
+        <div class="pannel-media">
+
+            {% include 'includes/stories.html' %}
+
+        </div>
+        
+
+        {% include 'includes/cards.html' %}
+
+    
+
+    </div>
+
+
+<!-- recommended side bar -->
+    <div class="hidden-media"> 
+        {% include 'includes/suggestions.html' %}
+    </div>
+
+
+</body>
+</html>
+
+<!-- For a feature that would allow users to easily add alt-text to 
+their posts on Instagram, I would first make it more visible.
+Instead of having to go to advanced settings, I would put 
+an "add alt text" option right below the option to write a 
+comment. Whatever the poster types there will go into the
+alt-text portion of the image HTML code.  Additionally, much
+like how the location feature for posts work on Instagram,
+I would make the alt-text visible above the post for users
+viewing the post. -->
