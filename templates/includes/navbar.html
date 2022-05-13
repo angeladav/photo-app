@@ -1,8 +1,14 @@
-
-<div class="topbar">
-    <p class="header-left">Photo App</p>
-    <div class="header-right">
-        <span class="username"> {{user['username']}} </span>
-        <a href="" class="link"> Sign out </a>
-    </div>
-</div>
+<nav class="main-nav">
+    <h1>Photo App</h1>
+    <ul>
+        <li>
+            {% if request.url_rule.endpoint == 'api_docs' %}
+                <a href="/">Home</a>
+            {% else %}
+                <a href="/api">API Docs</a>
+            {% endif %}
+        </li>
+        <li><span>{{ user.username }}</span></li>
+        <li><a href="#">Sign out</a></li>
+    </ul>
+</nav>
