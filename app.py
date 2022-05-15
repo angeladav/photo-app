@@ -36,6 +36,12 @@ def home():
         user=app.current_user
     )
 
+@app.route('/lab07')
+def lab07():
+    return render_template(
+        'lab07.html', 
+        user=app.current_user
+    )
 
 @app.route('/api')
 @app.route('/api/')
