@@ -36,12 +36,12 @@ class FollowingListEndpoint(Resource):
             if uid.isdigit():
                 uid = int(uid)
             else:
-                return Response(json.dumps({"message": "ssid={0} is invalid".format(uid)}), mimetype="application/json", status=400)
+                return Response(json.dumps({"message": "id={0} is invalid".format(uid)}), mimetype="application/json", status=400)
 
         user_ids = User.query.get(uid)
 
         if not user_ids:
-            return Response(json.dumps({"message": "dd id={0} is invalid".format(uid)}), mimetype="application/json", status=404)
+            return Response(json.dumps({"message": "id={0} is invalid".format(uid)}), mimetype="application/json", status=404)
 
         followingOrNot  = Following.query.filter_by(user_id = self.current_user.id)
 

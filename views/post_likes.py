@@ -54,7 +54,7 @@ class PostLikesDetailEndpoint(Resource):
         if not isinstance(id, int):
             return Response(json.dumps({"message": "id={0} is invalid".format(id)}), mimetype="application/json", status=400)
 
-        if id == NULL:  
+        if not(id):  
             return Response(json.dumps({"message": "post_id is required"}), mimetype="application/json", status=400)
 
         post_like = LikePost.query.get(id)
