@@ -21,33 +21,6 @@ const displayStories = () => {
 
 // USER
 
-var loggedInUser = {};
-var userBookmarks = {};
-
-const initUserData = async () => {
-    getUser().then(userData => {
-        loggedInUser = userData;
-    })
-};
-
-const getUser = async () => {
-    const request = await fetch('https://photo-app-acd.herokuapp.com/api/profile');
-    const userData = await request.json();
-    return userData;
-};
-
-const initUserBookmark = async () => {
-    getUser().then(userData => {
-        userBookmarks = userData;
-    })
-};
-
-const getBookmarks = async () => {
-    const request = await fetch('https://photo-app-acd.herokuapp.com/api/bookmarks/');
-    const userData = await request.json();
-    return userData;
-};
-
 const self2Html = user => {
     return `<div class = "me"> 
                 <img src = "${user.thumb_url}">
@@ -147,7 +120,7 @@ const getSuggestions = () => {
 
 // POSTS
 
-const displayPosts = async () => {
+const displayPosts = () => {
     fetch('https://photo-app-acd.herokuapp.com/api/posts/')
     .then(response => response.json())
     .then(posts => {
@@ -157,39 +130,64 @@ const displayPosts = async () => {
     });
 };
 
+var lastFocus;
+
 const toggleOpenModal = ev => {
     const elem = ev.currentTarget;
+    lastFocus = document.activeElement;
     let modal = elem.nextSibling;
     modal.style.display = "flex";
+    modal.getAttribute('aria-hidden') = "false";
+
+    currentId = elem.id;
+    closeButton =  document.querySelector("#close" + String(currentId));
+    console.log("toggleOpenModel");
+    console.log(closeButton);
+    closeButton.innterHTML = "focus(event);";
+
+    document.addEventListener("focus", function(event) {
+        dialog = closeButton;
+        
+        if (dialog && !dialog.contains(event.target)) {
+            event.stopPropagation();
+            dialog.focus();
+        }
+    
+    }, true);
+
+    closeButton.tabIndex = -1;
+    closeButton.focus();
+    
     let bod = document.querySelector("body");
     bod.style.overflow = "hidden";
 };
 
+
+
 const toggleCloseModal = ev => {
     const elem = ev.currentTarget;
+    lastFocus.focus();
     let modal = elem.parentNode;
     modal.style.display = "none";
     let bod = document.querySelector("body");
     bod.style.overflow = "auto";
 };
 
-
-// TODO
-
 const toggleLike = (ev) => {
     const elem = ev.currentTarget;
-    if (elem.innerHTML === `<i class="far fa-heart"></i>`) {
-        console.log(elem.id);
-        likePost(Number(elem.id), elem);
+    console.log(elem.getAttribute('aria-check'));
+    if (elem.getAttribute('aria-check') === "true") {
+        
+        unlikePost(Number(elem.getAttribute('data-postLikeId')))
+        
     }
     else {
-        unlikePost(elem.id, elem)
+        likePost(Number(elem.id));
     }
 
 };
 
-const likePost = (postId, elem) => {
-    var postStatus = "needToLike";
+const likePost = (postId) => {
     const postData = {
         "post_id": postId
     };
@@ -203,13 +201,12 @@ const likePost = (postId, elem) => {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            redrawPost(postStatus, elem);
+            displayPosts();
         }); 
 };
 
-const unlikePost = (postId, elem) => {
-    var postStatus = "needToUnlike";
-    const url = `https://photo-app-acd.herokuapp.com/api/posts/likes/${postId}`;
+const unlikePost = (postLikeId) => {
+    const url = `https://photo-app-acd.herokuapp.com/api/posts/likes/${postLikeId}`;
     fetch(url, {
         method: "DELETE",
         headers: {
@@ -219,46 +216,78 @@ const unlikePost = (postId, elem) => {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            redrawPost(postStatus, elem);
+            displayPosts();
         });
 };
 
-const redrawPost = (postStatus, elem) => {
-    if (postStatus === "needToLike") {
-        elem.innerHTML = '<i class="fas fa-heart"></i>';
+
+const toggleBookmark = (ev) => {
+    const elem = ev.currentTarget;
+    if (elem.getAttribute('aria-check') === "true") {
+        
+        unbookmarkPost(Number(elem.getAttribute('data-postBookmarkId')))
+        
     }
     else {
-        elem.innerHTML = '<i class="far fa-heart"></i>';
+        bookmarkPost(Number(elem.id));
     }
+
 };
 
+const unbookmarkPost = (postBookmarkId) => {
+    const url = `https://photo-app-acd.herokuapp.com/api/bookmarks/${postBookmarkId}`;
+    fetch(url, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            displayPosts();
+        });
+};
 
-
-
-
+const bookmarkPost = (postId) => {
+    const postData = {
+        "post_id": postId
+    };
+    fetch("https://photo-app-acd.herokuapp.com/api/bookmarks/", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            displayPosts();
+        }); 
+};
 
 const posts2Html = (post) => {
     let likes = post.likes;
     let numOfLikes = likes.length;
 
-    currentUser = loggedInUser.id;
+    var ariaStuff = "false";
     heartOrNot = `<i class="far fa-heart"></i>`;
-
     for (let i = 0; i < numOfLikes; i++) {
-        if (likes[i].user_id == currentUser)
+        if (post.current_user_like_id && likes[i].id === post.current_user_like_id)
         {
+            ariaStuff = "true";
             heartOrNot = `<i class="fas fa-heart"></i>`;
         } 
     }
 
-    var postId = post.id;
-    var bookmarkedOrNot = `<i class="far fa-bookmark" id = "liked"></i>`;
+    var userBookmark = post.current_user_bookmark_id;
+    var bookmarkedOrNot = `<i class="far fa-bookmark"></i>`;
+    var ariaStuffBookmark = "false";
 
-    for (let i = 0; i < userBookmarks.length; i++) {
-        if (userBookmarks[i].post.id == postId)
-        {
-            bookmarkedOrNot = `<i class="fas fa-bookmark" id = "not-liked"></i>`;
-        } 
+    if (userBookmark) {
+        bookmarkedOrNot = `<i class="fas fa-bookmark"></i>`;
+        ariaStuffBookmark = "true";
     }
 
     let allCom = post.comments;
@@ -289,9 +318,9 @@ const posts2Html = (post) => {
 
     if (allCom.length > 1) {
         viewComHtml = `<br>
-                        <button class="linkcom" onclick = "toggleOpenModal(event);"> View all ${allCom.length} comments </button>`
+                        <button class="linkcom" id = ${post.id} onclick = "toggleOpenModal(event);"> View all ${allCom.length} comments </button>`
                         + 
-                        `<div class = "modal">
+                        `<div class = "modal" aria-hidden = "true" role="dialog">
                             <div class = "focused">
                                 <img src="${post.image_url} " id="post-image-focus">
                                 <div class = "comment-box-focus"> 
@@ -303,7 +332,7 @@ const posts2Html = (post) => {
                                     ${allComHtml}
                                 </div>
                             </div>
-                            <button class="close" onclick = "toggleCloseModal(event);">X</button>
+                            <button class="close" id = close${post.id} onclick = "toggleCloseModal(event);">X</button>
                         </div>`
                         + viewComHtml;
     } 
@@ -325,12 +354,16 @@ const posts2Html = (post) => {
                 
                 <div class="icons"> 
                     <div class="right-icons">
-                        <button class="like-heart" id = ${post.id} onclick = "toggleLike(event);" >${heartOrNot}</button>
+                        <button class="like-heart" id = ${post.id} data-postLikeId = ${post.current_user_like_id} 
+                            aria-label = "Like / Unlike button" aria-check = ${ariaStuff}
+                            onclick = "toggleLike(event);" >${heartOrNot}</button>
                         <i class="far fa-comment"></i>
                         <i class="far fa-paper-plane"></i>
                     </div>
                     <div class="left-icon">
-                        <button class="bookmark-bookmark" onclick = "toggleBookmark(event);" >${bookmarkedOrNot}</button>
+                        <button class="bookmark-bookmark" id = ${post.id} onclick = "toggleBookmark(event);" 
+                        data-postBookmarkId = ${post.current_user_bookmark_id} aria-label = "Bookmark / Unbookmark button" aria-check = ${ariaStuffBookmark}
+                        >${bookmarkedOrNot}</button>
                     </div>
                 </div>
                 
@@ -349,19 +382,43 @@ const posts2Html = (post) => {
                         </div>
                         <input type = "text" placeholder = "Add a comment...">
                     </div>
-                    <button class="link"> Post </button>
+                    <button class="link" id = ${post.id} onclick = "toggleComment(event);"> Post </button>
                 </div> 
             </div>`
 };
 
 
 // COMMENTS
+const toggleComment = (ev) => {
+    const elem = ev.currentTarget;
+    var currentComment = elem.previousSibling.previousSibling.lastChild.previousElementSibling;
+    if (currentComment.value)
+    {
+        postComment(Number(elem.id), currentComment.value);
+    }
+};
 
+const postComment = (postId, text) => {
+    const postData = {
+        "post_id": postId,
+        "text": text
+    };
+    
+    fetch("https://photo-app-acd.herokuapp.com/api/comments", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            displayPosts();
+        });
+};
 
 const initPage = async () => {
-    await initUserData();
-    await initUserBookmark();
-    
     displaySelf();
     displayStories();
     getSuggestions();
