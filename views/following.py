@@ -31,21 +31,25 @@ class FollowingListEndpoint(Resource):
         if not body.get('user_id'):
             return Response(json.dumps({"message": "following_id is required"}), mimetype="application/json", status=400)
 
-        if not isinstance(body.get('user_id'),int):
-            return Response(json.dumps({"message": "id={0} is invalid".format(body.get('user_id'))}), mimetype="application/json", status=400)
+        uid = body.get('user_id')
+        if not isinstance(uid, int):
+            if uid.isdigit():
+                uid = int(uid)
+            else:
+                return Response(json.dumps({"message": "id={0} is invalid".format(uid)}), mimetype="application/json", status=400)
 
-        user_ids = User.query.get(body.get('user_id'))
+        user_ids = User.query.get(uid)
 
         if not user_ids:
-            return Response(json.dumps({"message": "id={0} is invalid".format(body.get('user_id'))}), mimetype="application/json", status=404)
+            return Response(json.dumps({"message": "id={0} is invalid".format(uid)}), mimetype="application/json", status=404)
 
         followingOrNot  = Following.query.filter_by(user_id = self.current_user.id)
 
         for person in followingOrNot:
-            if person.following_id == body.get('user_id'):
+            if person.following_id == uid:
                 return Response(json.dumps({"message": "already following user"}), mimetype="application/json", status=400)
         
-        follow = Following(user_id = self.current_user.id, following_id = body.get('user_id'))
+        follow = Following(user_id = self.current_user.id, following_id = uid)
 
         db.session.add(follow)
         db.session.commit()
