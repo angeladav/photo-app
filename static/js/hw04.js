@@ -61,6 +61,7 @@ const followUser = (userId, elem) => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
         },
         body: JSON.stringify(postData)   
     })
@@ -78,7 +79,9 @@ const unfollowUser = (followingId, elem) => {
     const deleteURL = `https://photo-app-acd.herokuapp.com/api/following/${followingId}`;
     fetch(deleteURL, {
         method: "DELETE",
-
+        headers: {
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -195,6 +198,7 @@ const likePost = (postId) => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
         },
         body: JSON.stringify(postData)
         })
@@ -211,6 +215,7 @@ const unlikePost = (postLikeId) => {
         method: "DELETE",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
         }
         })
         .then(response => response.json())
@@ -240,6 +245,7 @@ const unbookmarkPost = (postBookmarkId) => {
         method: "DELETE",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
         }
         })
         .then(response => response.json())
@@ -257,6 +263,7 @@ const bookmarkPost = (postId) => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
         },
         body: JSON.stringify(postData)
         })
@@ -408,6 +415,7 @@ const postComment = (postId, text) => {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCookie('csrf_access_token')
             },
             body: JSON.stringify(postData)
         })
